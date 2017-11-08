@@ -19,6 +19,7 @@ class CreateUsers extends Migration
             $table->string('email');
             $table->string('password');
             $table->string('thumbnail')->nullable();
+            $table->string('remember_token')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
