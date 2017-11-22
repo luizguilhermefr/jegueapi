@@ -41,7 +41,7 @@ class Validator
     public static function validateString($string, $min = 3, $max = 255)
     {
         $len = strlen($string);
-        if ($len < 3 || $len > $max) {
+        if ($len < $min || $len > $max) {
             throw new StringLengthException();
         }
         return true;

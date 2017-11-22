@@ -55,7 +55,7 @@ class UploadTest extends TestCase
         ];
         $expectedReturn = [
             'success' => false,
-            'error' => 'NAME_TOO_SMALL'
+            'error' => 'INVALID_STRING_LENGTH'
         ];
         $response = $this->json('POST', '/videos', $content, [
             'X-token' => $user->remember_token
