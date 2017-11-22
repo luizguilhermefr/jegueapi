@@ -1,5 +1,6 @@
 <?php
 
+use App\Category;
 use App\User;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
@@ -16,23 +17,25 @@ class UploadTest extends TestCase
     public function testVideoCreation()
     {
         $user = factory(User::class)->create();
+        $category = factory(Category::class)->create();
         $content = [
             'name' => 'Trollei minha mãe com amoeba',
             'tags' => [
                 'trollagem',
                 'amoeba',
                 'treta news',
+                'trollagem',
             ],
             'description' => 'Hoje eu trollei minha mãe com amoeba. It was cool.',
-            'category_id' => 3,
+            'category_id' => $category->id,
         ];
         $expectedReturn = [
-            'success' => true
+            'success' => true,
         ];
         $response = $this->json('POST', '/videos', $content, [
-            'X-token' => $user->remember_token
+            'X-token' => $user->remember_token,
         ]);
-        $response->assertResponseStatus(200);
+        $response->assertResponseStatus(201);
         $response->seeJsonContains($expectedReturn);
     }
 
@@ -45,22 +48,53 @@ class UploadTest extends TestCase
     public function testTooSmallResponse()
     {
         $user = factory(User::class)->create();
+        $category = factory(Category::class)->create();
         $content = [
-            'name' => 'Tro',
+            'name' => 'Tr',
             'tags' => [
-                'trollagem'
+                'trollagem',
             ],
             'description' => 'Esqueci o ponto e vírgula...',
-            'category_id' => 3,
+            'category_id' => $category->id,
         ];
         $expectedReturn = [
             'success' => false,
-            'error' => 'INVALID_STRING_LENGTH'
+            'error' => 'INVALID_STRING_LENGTH',
         ];
         $response = $this->json('POST', '/videos', $content, [
-            'X-token' => $user->remember_token
+            'X-token' => $user->remember_token,
         ]);
         $response->assertResponseStatus(400);
+        $response->seeJsonContains($expectedReturn);
+    }
+
+    /**
+     * Given that a user may put an invalid category
+     * id, it must be refused.
+     *
+     * @test
+     */
+    public function testInvalidCategory()
+    {
+        $user = factory(User::class)->create();
+        $content = [
+            'name' => 'Trollei minha mãe com amoeba',
+            'tags' => [
+                'trollagem',
+                'amoeba',
+                'treta news',
+            ],
+            'description' => 'Hoje eu trollei minha mãe com amoeba. It was cool.',
+            'category_id' => 999,
+        ];
+        $expectedReturn = [
+            'success' => false,
+            'error' => 'CATEGORY_NOT_FOUND',
+        ];
+        $response = $this->json('POST', '/videos', $content, [
+            'X-token' => $user->remember_token,
+        ]);
+        $response->assertResponseStatus(404);
         $response->seeJsonContains($expectedReturn);
     }
 
@@ -84,10 +118,36 @@ class UploadTest extends TestCase
         ];
         $expectedReturn = [
             'success' => false,
-            'error' => 'UNAUTHORIZED_USER'
+            'error' => 'UNAUTHORIZED_USER',
         ];
         $response = $this->json('POST', '/videos', $content);
         $response->assertResponseStatus(403);
+        $response->seeJsonContains($expectedReturn);
+    }
+
+    /**
+     * Given that a user may try to upload a video
+     * without a single tag, enforce him to put at least one.
+     *
+     * @test
+     */
+    public function testRequiredTags()
+    {
+        $user = factory(User::class)->create();
+        $category = factory(Category::class)->create();
+        $content = [
+            'name' => 'Trollei minha mãe com amoeba',
+            'description' => 'Hoje eu trollei minha mãe com amoeba. It was cool.',
+            'category_id' => $category->id,
+        ];
+        $expectedReturn = [
+            'success' => false,
+            'error' => 'REQUIRED_PARAMETER'
+        ];
+        $response = $this->json('POST', '/videos', $content, [
+            'X-token' => $user->remember_token,
+        ]);
+        $response->assertResponseStatus(400);
         $response->seeJsonContains($expectedReturn);
     }
 }

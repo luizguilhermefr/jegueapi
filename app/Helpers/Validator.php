@@ -25,12 +25,15 @@ class Validator
                     throw new RequiredParameterException();
                 }
             }
-        } else if (is_null($something)) {
-            throw new RequiredParameterException();
+        } else {
+            if (is_null($something)) {
+                throw new RequiredParameterException();
+            }
         }
 
         return true;
     }
+
     /**
      * @param string $string
      * @param int $min
@@ -44,6 +47,7 @@ class Validator
         if ($len < $min || $len > $max) {
             throw new StringLengthException();
         }
+
         return true;
     }
 
