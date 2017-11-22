@@ -56,7 +56,8 @@ class User extends Model
     public static function findByEmailAndPassword($email, $password)
     {
         return self::where('email', $email)
-            ->where('password', hash('sha256', $password))->first();
+            ->where('password', hash('sha256', $password))
+            ->first();
     }
 
     /**
@@ -97,5 +98,15 @@ class User extends Model
     public function getRememberToken()
     {
         return $this->remember_token;
+    }
+
+    /**
+     * @param string $token
+     * @return User|null
+     */
+    public static function findByToken($token)
+    {
+        return self::where('remember_token', $token)
+            ->first();
     }
 }
