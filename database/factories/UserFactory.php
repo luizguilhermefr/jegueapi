@@ -8,5 +8,6 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'password' => hash('sha256', $password),
         'description' => $faker->name,
         'email' => $faker->email,
+        'remember_token' => $faker->sha256
     ];
 });
