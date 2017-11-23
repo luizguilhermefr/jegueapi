@@ -56,6 +56,7 @@ class VideosController extends Controller
     /**
      * @param Request $request
      * @param string $id
+     * @return JsonResponse
      * @throws UnauthorizedUserException
      * @throws VideoAlreadyUploadedException
      * @throws VideoNotFoundException
@@ -72,6 +73,8 @@ class VideosController extends Controller
         if ($video->playable != null) {
             throw new VideoAlreadyUploadedException();
         }
+
+        $request->file('video')->storePubliclyAs('videos', "{$video->id}.mp4");
 
         // upload video
 

@@ -99,4 +99,8 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+$app->configure('filesystems');
+
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+
 return $app;
