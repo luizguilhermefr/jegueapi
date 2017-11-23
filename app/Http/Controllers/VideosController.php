@@ -63,7 +63,7 @@ class VideosController extends Controller
     public function upload(Request $request, $id)
     {
         $video = Video::find($id);
-        if (!$video) {
+        if (! $video) {
             throw new VideoNotFoundException();
         }
         if ($video->owner != $request->user->username) {
@@ -72,5 +72,9 @@ class VideosController extends Controller
         if ($video->playable != null) {
             throw new VideoAlreadyUploadedException();
         }
+
+        // upload video
+
+        return response()->json(['success' => true], 200);
     }
 }
