@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Exceptions\CategoryNotFoundException;
+use App\Exceptions\UnauthorizedUserException;
+use App\Exceptions\VideoAlreadyUploadedException;
+use App\Exceptions\VideoNotFoundException;
 use App\Helpers\Validator;
 use App\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Webpatser\Uuid\Uuid;
 
 class VideosController extends Controller
 {
@@ -49,5 +51,26 @@ class VideosController extends Controller
             'success' => true,
             'id' => $video->id,
         ], 201);
+    }
+
+    /**
+     * @param Request $request
+     * @param int $id
+     * @throws UnauthorizedUserException
+     * @throws VideoAlreadyUploadedException
+     * @throws VideoNotFoundException
+     */
+    public function upload(Request $request, $id)
+    {
+        $video = Video::find($id);
+        if (!$video) {
+            throw new VideoNotFoundException();
+        }
+        if ($video->owner != $request->user->username) {
+            throw new UnauthorizedUserException();
+        }
+        if ($video->playable != null) {
+            throw new VideoAlreadyUploadedException();
+        }
     }
 }

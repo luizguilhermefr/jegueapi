@@ -188,12 +188,13 @@ class UploadTest extends TestCase
     public function testVideoUpload()
     {
         $video = factory(Video::class)->create([
+            'owner' => $this->user->username,
             'playable' => null,
         ]);
         Storage::fake('videos');
         $response = $this->json('POST', "/videos/{$video->id}", [
             'video' => UploadedFile::fake()
-                ->create('bear.mp4', '1024'),
+                ->create('bear.mp4', 1024),
         ], [
             'X-token' => $this->user->remember_token,
         ]);
@@ -203,6 +204,24 @@ class UploadTest extends TestCase
         ]);
         Storage::disk('videos')
             ->assertExists("{$video->id}.mp4");
+    }
+
+    /**
+     * Given an user trying to upload to an unexistent video,
+     * deny him.
+     *
+     * @test
+     */
+    public function testVideoNotFound()
+    {
+        $response = $this->json('POST', '/videos/1024', [], [
+            'X-token' => $this->user->remeber_token,
+        ]);
+        $response->assertResponseStatus(404);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'VIDEO_NOT_FOUND',
+        ]);
     }
 
     /**
@@ -217,7 +236,7 @@ class UploadTest extends TestCase
         Storage::fake('videos');
         $response = $this->json('POST', "/videos/{$video->id}", [
             'video' => UploadedFile::fake()
-                ->create('bear.mp4', '1024'),
+                ->create('bear.mp4', 1024),
         ], [
             'X-token' => $this->user->remember_token,
         ]);
@@ -225,27 +244,6 @@ class UploadTest extends TestCase
         $response->seeJsonContains([
             'success' => false,
             'error' => 'VIDEO_ALREADY_UPLOADED',
-        ]);
-    }
-
-    /**
-     * Given an user trying to upload to an unexistent video,
-     * deny him.
-     *
-     * @test
-     */
-    public function testVideoNotFound()
-    {
-        $response = $this->json('POST', "/videos/1024", [
-            'video' => UploadedFile::fake()
-                ->create('bear.mp4', '1024'),
-        ], [
-            'X-token' => $this->user->remeber_token,
-        ]);
-        $response->assertResponseStatus(404);
-        $response->seeJsonContains([
-            'success' => false,
-            'error' => 'VIDEO_NOT_FOUND',
         ]);
     }
 }

@@ -15,3 +15,4 @@ $router->post('/register', 'UsersController@register');
 $router->post('/login', 'UsersController@login');
 
 $router->post('/videos', ['middleware' => 'auth', 'uses' => 'VideosController@create']);
+$router->post('/videos/{id}', ['middleware' => 'auth', 'uses' => 'VideosController@upload']);
