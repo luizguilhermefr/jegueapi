@@ -27,7 +27,6 @@ class VideosController extends Controller
         }
 
         $video = new Video();
-        $video->id = Uuid::generate();
         $video->name = $request->input('name');
         $video->description = $request->input('description');
         $video->owner = $request->user->username;

@@ -2,10 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Video extends Model
+class Video extends UidModel
 {
     /**
      * The attributes that are mass assignable.
@@ -30,14 +29,17 @@ class Video extends Model
 
     /**
      * @param string $tag
-     * @return TagInVideo
      */
     public function pushTag($tag)
     {
-        return $this->tags()
-            ->firstOrNew([
-                'name' => $tag,
-            ]);
+        if (! $this->tags()
+            ->where('name', $tag)
+            ->count()) {
+            $this->tags()
+                ->create([
+                    'name' => $tag,
+                ]);
+        }
     }
 
     /**
