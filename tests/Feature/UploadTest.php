@@ -2,11 +2,25 @@
 
 use App\Category;
 use App\User;
+use App\Video;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class UploadTest extends TestCase
 {
     use DatabaseTransactions;
+
+    /**
+     * @var User
+     */
+    protected $user;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->user = factory(User::class)->create();
+    }
 
     /**
      * Given a user trying to create a new video, let it be created.
@@ -16,7 +30,6 @@ class UploadTest extends TestCase
      */
     public function testVideoCreation()
     {
-        $user = factory(User::class)->create();
         $category = factory(Category::class)->create();
         $content = [
             'name' => 'Trollei minha mãe com amoeba',
@@ -33,7 +46,7 @@ class UploadTest extends TestCase
             'success' => true,
         ];
         $response = $this->json('POST', '/videos', $content, [
-            'X-token' => $user->remember_token,
+            'X-token' => $this->user->remember_token,
         ]);
         $response->assertResponseStatus(201);
         $response->seeJsonContains($expectedReturn);
@@ -47,7 +60,6 @@ class UploadTest extends TestCase
      */
     public function testTooSmallResponse()
     {
-        $user = factory(User::class)->create();
         $category = factory(Category::class)->create();
         $content = [
             'name' => 'Tr',
@@ -62,7 +74,7 @@ class UploadTest extends TestCase
             'error' => 'INVALID_STRING_LENGTH',
         ];
         $response = $this->json('POST', '/videos', $content, [
-            'X-token' => $user->remember_token,
+            'X-token' => $this->user->remember_token,
         ]);
         $response->assertResponseStatus(400);
         $response->seeJsonContains($expectedReturn);
@@ -99,8 +111,8 @@ class UploadTest extends TestCase
     }
 
     /**
-     * Given that the user must be authenticated to upload a vide,
-     * refuse any try of uploading without X-token.
+     * Given that the user must be authenticated to  create or
+     * upload a video, refuse any try of uploading without X-token.
      *
      * @test
      */
@@ -123,6 +135,23 @@ class UploadTest extends TestCase
         $response = $this->json('POST', '/videos', $content);
         $response->assertResponseStatus(403);
         $response->seeJsonContains($expectedReturn);
+        //
+        $video = factory(Video::class)->create([
+            'playable' => null,
+            'user_id' => $this->user->id,
+        ]);
+        Storage::fake('videos');
+        $response = $this->json('POST', "/videos/{$video->id}", [
+            'video' => UploadedFile::fake()
+                ->create('bear.mp4', '1024'),
+        ], [
+            'X-token' => 'notmyuniquetoken',
+        ]);
+        $response->assertResponseStatus(403);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'UNAUTHORIZED_USER',
+        ]);
     }
 
     /**
@@ -133,7 +162,6 @@ class UploadTest extends TestCase
      */
     public function testRequiredTags()
     {
-        $user = factory(User::class)->create();
         $category = factory(Category::class)->create();
         $content = [
             'name' => 'Trollei minha mãe com amoeba',
@@ -142,12 +170,82 @@ class UploadTest extends TestCase
         ];
         $expectedReturn = [
             'success' => false,
-            'error' => 'REQUIRED_PARAMETER'
+            'error' => 'REQUIRED_PARAMETER',
         ];
         $response = $this->json('POST', '/videos', $content, [
-            'X-token' => $user->remember_token,
+            'X-token' => $this->user->remember_token,
         ]);
         $response->assertResponseStatus(400);
         $response->seeJsonContains($expectedReturn);
+    }
+
+    /**
+     * Given an user trying to upload a video to the
+     * storage, assert it get success.
+     *
+     * @test
+     */
+    public function testVideoUpload()
+    {
+        $video = factory(Video::class)->create([
+            'playable' => null,
+        ]);
+        Storage::fake('videos');
+        $response = $this->json('POST', "/videos/{$video->id}", [
+            'video' => UploadedFile::fake()
+                ->create('bear.mp4', '1024'),
+        ], [
+            'X-token' => $this->user->remember_token,
+        ]);
+        $response->assertResponseStatus(200);
+        $response->seeJsonContains([
+            'success' => true,
+        ]);
+        Storage::disk('videos')
+            ->assertExists("{$video->id}.mp4");
+    }
+
+    /**
+     * Given an user trying to upload a video that
+     * has been already uploaded, deny him.
+     *
+     * @test
+     */
+    public function testVideoAlreadyUploaded()
+    {
+        $video = factory(Video::class)->create();
+        Storage::fake('videos');
+        $response = $this->json('POST', "/videos/{$video->id}", [
+            'video' => UploadedFile::fake()
+                ->create('bear.mp4', '1024'),
+        ], [
+            'X-token' => $this->user->remember_token,
+        ]);
+        $response->assertResponseStatus(409);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'VIDEO_ALREADY_UPLOADED',
+        ]);
+    }
+
+    /**
+     * Given an user trying to upload to an unexistent video,
+     * deny him.
+     *
+     * @test
+     */
+    public function testVideoNotFound()
+    {
+        $response = $this->json('POST', "/videos/1024", [
+            'video' => UploadedFile::fake()
+                ->create('bear.mp4', '1024'),
+        ], [
+            'X-token' => $this->user->remeber_token,
+        ]);
+        $response->assertResponseStatus(404);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'VIDEO_NOT_FOUND',
+        ]);
     }
 }

@@ -6,11 +6,19 @@ use App\Category;
 use App\Exceptions\CategoryNotFoundException;
 use App\Helpers\Validator;
 use App\Video;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Webpatser\Uuid\Uuid;
 
 class VideosController extends Controller
 {
+    /**
+     * Efetua o cadastro de um vídeo. O vídeo é enviado posteriormente.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws CategoryNotFoundException
+     */
     public function create(Request $request)
     {
         Validator::validateRequired([
