@@ -214,8 +214,8 @@ class UploadTest extends TestCase
      */
     public function testVideoNotFound()
     {
-        $response = $this->json('POST', '/videos/1024', [], [
-            'X-token' => $this->user->remeber_token,
+        $response = $this->json('POST', '/videos/65536', [], [
+            'X-token' => $this->user->remember_token,
         ]);
         $response->assertResponseStatus(404);
         $response->seeJsonContains([
@@ -232,7 +232,9 @@ class UploadTest extends TestCase
      */
     public function testVideoAlreadyUploaded()
     {
-        $video = factory(Video::class)->create();
+        $video = factory(Video::class)->create([
+            'owner' => $this->user->username
+        ]);
         Storage::fake('videos');
         $response = $this->json('POST', "/videos/{$video->id}", [
             'video' => UploadedFile::fake()

@@ -55,7 +55,7 @@ class VideosController extends Controller
 
     /**
      * @param Request $request
-     * @param int $id
+     * @param string $id
      * @throws UnauthorizedUserException
      * @throws VideoAlreadyUploadedException
      * @throws VideoNotFoundException
