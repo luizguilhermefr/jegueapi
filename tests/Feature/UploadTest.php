@@ -138,7 +138,7 @@ class UploadTest extends TestCase
         //
         $video = factory(Video::class)->create([
             'playable' => null,
-            'user_id' => $this->user->id,
+            'owner' => $this->user->username,
         ]);
         Storage::fake('videos');
         $response = $this->json('POST', "/videos/{$video->id}", [
