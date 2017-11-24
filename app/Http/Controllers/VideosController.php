@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Exceptions\CategoryNotFoundException;
+use App\Exceptions\EmptyVideoException;
+use App\Exceptions\RequiredParameterException;
 use App\Exceptions\UnauthorizedUserException;
 use App\Exceptions\VideoAlreadyUploadedException;
 use App\Exceptions\VideoNotFoundException;
@@ -60,6 +62,8 @@ class VideosController extends Controller
      * @throws UnauthorizedUserException
      * @throws VideoAlreadyUploadedException
      * @throws VideoNotFoundException
+     * @throws RequiredParameterException
+     * @throws EmptyVideoException
      */
     public function upload(Request $request, $id)
     {
@@ -73,10 +77,14 @@ class VideosController extends Controller
         if ($video->playable != null) {
             throw new VideoAlreadyUploadedException();
         }
+        if (! $request->hasFile('video')) {
+            throw new RequiredParameterException();
+        }
 
-        $request->file('video')->storePubliclyAs('videos', "{$video->id}.mp4");
+        $request->file('video')
+            ->storePubliclyAs('videos', "{$video->id}.mp4");
 
-        // upload video
+        // call parse job
 
         return response()->json(['success' => true], 200);
     }

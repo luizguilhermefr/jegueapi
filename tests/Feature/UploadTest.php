@@ -225,6 +225,42 @@ class UploadTest extends TestCase
     }
 
     /**
+     * Given that the user may upload a file that is null
+     * or with size equal to zero, throw the appropriate exception.
+     *
+     * @test
+     */
+    public function testUploadWithoutFile()
+    {
+        $video = factory(Video::class)->create([
+            'owner' => $this->user->username,
+            'playable' => null
+        ]);
+        Storage::fake('videos');
+        //
+        $response = $this->json('POST', "/videos/{$video->id}", [
+            'video' => UploadedFile::fake()
+                ->create('bear.mp4', 0),
+        ], [
+            'X-token' => $this->user->remember_token,
+        ]);
+        $response->assertResponseStatus(400);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'REQUIRED_PARAMETER',
+        ]);
+        //
+        $response = $this->json('POST', "/videos/{$video->id}", [], [
+            'X-token' => $this->user->remember_token,
+        ]);
+        $response->assertResponseStatus(400);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'REQUIRED_PARAMETER',
+        ]);
+    }
+
+    /**
      * Given an user trying to upload a video that
      * has been already uploaded, deny him.
      *

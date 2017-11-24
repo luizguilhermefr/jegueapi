@@ -100,6 +100,8 @@ $app->router->group([
 });
 
 $app->configure('filesystems');
+$app->configure('database');
+$app->configure('queue');
 
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 
