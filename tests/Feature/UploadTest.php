@@ -236,8 +236,30 @@ class UploadTest extends TestCase
             'owner' => $this->user->username,
             'playable' => null
         ]);
+        $response = $this->json('POST', "/videos/{$video->id}", [], [
+            'X-token' => $this->user->remember_token,
+        ]);
+        $response->assertResponseStatus(400);
+        $response->seeJsonContains([
+            'success' => false,
+            'error' => 'REQUIRED_PARAMETER',
+        ]);
+    }
+
+    /**
+     * Given that the file must be greater than zero bytes, refuse
+     * any try of uploading empty file.
+     *
+     * @test
+     */
+    public function testUploadEmptyFile()
+    {
+
+        $video = factory(Video::class)->create([
+            'owner' => $this->user->username,
+            'playable' => null
+        ]);
         Storage::fake('videos');
-        //
         $response = $this->json('POST', "/videos/{$video->id}", [
             'video' => UploadedFile::fake()
                 ->create('bear.mp4', 0),
@@ -249,14 +271,33 @@ class UploadTest extends TestCase
             'success' => false,
             'error' => 'REQUIRED_PARAMETER',
         ]);
-        //
-        $response = $this->json('POST', "/videos/{$video->id}", [], [
+    }
+
+    /**
+     * Given that the file must be mp4 file, refuse
+     * any try of uploading mov, jpg, etc.
+     *
+     * @test
+     */
+    public function testWrongExtension()
+    {
+        // TODO: Faked UploadedFile always returns invalid file instead of invalid extension.
+        $this->markTestSkipped();
+        $video = factory(Video::class)->create([
+            'owner' => $this->user->username,
+            'playable' => null
+        ]);
+        Storage::fake('videos');
+        $response = $this->json('POST', "/videos/{$video->id}", [
+            'video' => UploadedFile::fake()
+                ->image('bear', '100', '100'),
+        ], [
             'X-token' => $this->user->remember_token,
         ]);
         $response->assertResponseStatus(400);
         $response->seeJsonContains([
             'success' => false,
-            'error' => 'REQUIRED_PARAMETER',
+            'error' => 'INVALID_EXTENSION',
         ]);
     }
 

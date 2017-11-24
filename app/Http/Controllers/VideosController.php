@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Exceptions\CategoryNotFoundException;
 use App\Exceptions\EmptyVideoException;
+use App\Exceptions\InvalidExtensionException;
 use App\Exceptions\RequiredParameterException;
 use App\Exceptions\UnauthorizedUserException;
 use App\Exceptions\VideoAlreadyUploadedException;
 use App\Exceptions\VideoNotFoundException;
 use App\Helpers\Validator;
+use App\Jobs\ParseVideoJob;
 use App\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,6 +66,7 @@ class VideosController extends Controller
      * @throws VideoNotFoundException
      * @throws RequiredParameterException
      * @throws EmptyVideoException
+     * @throws InvalidExtensionException
      */
     public function upload(Request $request, $id)
     {
@@ -80,11 +83,15 @@ class VideosController extends Controller
         if (! $request->hasFile('video')) {
             throw new RequiredParameterException();
         }
+        if ($request->file('video')
+                ->getMimeType() != 'video/mp4') {
+            throw new InvalidExtensionException();
+        }
 
         $request->file('video')
             ->storePubliclyAs('videos', "{$video->id}.mp4");
 
-        // call parse job
+        dispatch(new ParseVideoJob($video));
 
         return response()->json(['success' => true], 200);
     }

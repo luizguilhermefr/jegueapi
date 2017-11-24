@@ -19,9 +19,7 @@ try {
 |
 */
 
-$app = new Laravel\Lumen\Application(
-    realpath(__DIR__.'/../')
-);
+$app = new Laravel\Lumen\Application(realpath(__DIR__.'/../'));
 
 $app->withFacades();
 
@@ -38,18 +36,16 @@ $app->withEloquent();
 |
 */
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
+$app->singleton(Illuminate\Contracts\Debug\ExceptionHandler::class, App\Exceptions\Handler::class);
 
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
+$app->singleton(Illuminate\Contracts\Console\Kernel::class, App\Console\Kernel::class);
 
 $app->singleton('filesystem', function ($app) {
     return $app->loadComponent('filesystems', 'Illuminate\Filesystem\FilesystemServiceProvider', 'filesystem');
+});
+
+$app->singleton(Illuminate\Contracts\Filesystem\Factory::class, function ($app) {
+    return new Illuminate\Filesystem\FilesystemManager($app);
 });
 
 /*
@@ -63,9 +59,9 @@ $app->singleton('filesystem', function ($app) {
 |
 */
 
- $app->routeMiddleware([
-     'auth' => App\Http\Middleware\LoggedMiddleware::class,
- ]);
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\LoggedMiddleware::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
