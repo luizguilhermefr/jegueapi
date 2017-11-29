@@ -14,7 +14,7 @@ class CreateCommentsInVideos extends Migration
     public function up()
     {
         Schema::create('comments_in_videos', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->char('id', 36)->primary();
             $table->char('video_id', 36);
             $table->string('commenter');
             $table->timestamps();
