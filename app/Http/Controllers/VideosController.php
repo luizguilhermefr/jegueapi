@@ -92,10 +92,7 @@ class VideosController extends Controller
         $path = $request->file('video')
             ->storeAs('videos', "{$video->id}.mp4", 'public');
 
-        $video->setPlayable($path)
-            ->save();
-
-        dispatch(new ParseVideoJob($video));
+        dispatch(new ParseVideoJob($video, $path));
 
         return response()->json(['success' => true], 200);
     }

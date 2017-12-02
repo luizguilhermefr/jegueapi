@@ -18,6 +18,7 @@ class Video extends UidModel
         'playable',
         'owner',
         'category_id',
+        'thumbnail',
     ];
 
     /**
@@ -49,6 +50,17 @@ class Video extends UidModel
     public function setPlayable(string $url)
     {
         $this->playable = $url;
+
+        return $this;
+    }
+
+    /**
+     * @param string $url
+     * @return $this
+     */
+    public function setThumbnail(string $url)
+    {
+        $this->thumbnail = $url;
 
         return $this;
     }
