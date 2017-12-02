@@ -43,6 +43,17 @@ class Video extends UidModel
     }
 
     /**
+     * @param string $url
+     * @return Video
+     */
+    public function setPlayable(string $url)
+    {
+        $this->playable = $url;
+
+        return $this;
+    }
+
+    /**
      * @return HasMany
      */
     public function tags()

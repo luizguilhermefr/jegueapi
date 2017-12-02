@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Exceptions\CategoryNotFoundException;
-use App\Exceptions\EmptyVideoException;
 use App\Exceptions\InvalidExtensionException;
 use App\Exceptions\RequiredParameterException;
 use App\Exceptions\StringLengthException;
@@ -90,8 +89,11 @@ class VideosController extends Controller
             throw new InvalidExtensionException();
         }
 
-        $request->file('video')
-            ->storePubliclyAs('videos', "{$video->id}.mp4");
+        $path = $request->file('video')
+            ->storeAs('videos', "{$video->id}.mp4", 'public');
+
+        $video->setPlayable($path)
+            ->save();
 
         dispatch(new ParseVideoJob($video));
 

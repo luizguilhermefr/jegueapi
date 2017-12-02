@@ -101,6 +101,7 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+$app->configure('app');
 $app->configure('filesystems');
 $app->configure('database');
 $app->configure('queue');
