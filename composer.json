@@ -11,7 +11,8 @@
         "doctrine/dbal": "^2.5",
         "webpatser/laravel-uuid": "^3.0",
         "league/flysystem": "^1.0",
-        "predis/predis": "^1.1"
+        "predis/predis": "^1.1",
+        "palanik/lumen-cors": "^0.0.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

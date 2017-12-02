@@ -59,6 +59,10 @@ $app->singleton(Illuminate\Contracts\Filesystem\Factory::class, function ($app) 
 |
 */
 
+$app->middleware([
+    palanik\lumen\Middleware\LumenCors::class
+]);
+
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\LoggedMiddleware::class,
 ]);
