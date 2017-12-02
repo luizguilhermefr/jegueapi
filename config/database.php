@@ -64,7 +64,6 @@ return [
             'timezone'  => env('DB_TIMEZONE', '+00:00'),
             'strict'    => env('DB_STRICT_MODE', false),
         ],
-
     ],
 
     /*
@@ -94,6 +93,7 @@ return [
     'redis' => [
 
         'cluster' => env('REDIS_CLUSTER', false),
+        'client' => 'predis',
 
         'default' => [
             'host'     => env('REDIS_HOST', '127.0.0.1'),

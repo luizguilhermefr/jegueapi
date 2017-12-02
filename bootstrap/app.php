@@ -78,6 +78,8 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
@@ -102,7 +104,5 @@ $app->router->group([
 $app->configure('filesystems');
 $app->configure('database');
 $app->configure('queue');
-
-$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 
 return $app;

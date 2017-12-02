@@ -14,9 +14,10 @@ class UsersTableSeeder extends Seeder
     {
         factory(User::class, 10)->create();
         factory(User::class)->create([
+            'email' => 'ivonightgod@unioeste.br',
             'username' => 'ivonightgod',
             'description' => 'Ivonei Freitas',
-            'password' => 'designpatterns2017',
+            'password' => hash('sha256', 'designpatterns2017'),
             'remember_token' => 'this_is_token',
         ]);
     }

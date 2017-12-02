@@ -7,6 +7,7 @@ use App\Exceptions\CategoryNotFoundException;
 use App\Exceptions\EmptyVideoException;
 use App\Exceptions\InvalidExtensionException;
 use App\Exceptions\RequiredParameterException;
+use App\Exceptions\StringLengthException;
 use App\Exceptions\UnauthorizedUserException;
 use App\Exceptions\VideoAlreadyUploadedException;
 use App\Exceptions\VideoNotFoundException;
@@ -24,6 +25,8 @@ class VideosController extends Controller
      * @param Request $request
      * @return JsonResponse
      * @throws CategoryNotFoundException
+     * @throws RequiredParameterException
+     * @throws StringLengthException
      */
     public function create(Request $request)
     {
@@ -65,7 +68,6 @@ class VideosController extends Controller
      * @throws VideoAlreadyUploadedException
      * @throws VideoNotFoundException
      * @throws RequiredParameterException
-     * @throws EmptyVideoException
      * @throws InvalidExtensionException
      */
     public function upload(Request $request, $id)
