@@ -11,6 +11,8 @@
 |
 */
 
+$router->get('/', 'StatusController@checkStatus');
+
 $router->post('/register', 'UsersController@register');
 $router->post('/login', 'UsersController@login');
 
