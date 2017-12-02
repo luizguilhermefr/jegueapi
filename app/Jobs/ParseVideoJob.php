@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Exceptions\CannotFindVideoException;
 use App\Video;
+
 use Illuminate\Support\Facades\Storage;
 
 class ParseVideoJob extends Job

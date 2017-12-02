@@ -13,7 +13,7 @@
         "league/flysystem": "^1.0",
         "predis/predis": "^1.1",
         "palanik/lumen-cors": "^0.0.3",
-        "illuminate/redis": "^5.5"
+        "illuminate/redis": "^5.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
