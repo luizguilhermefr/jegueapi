@@ -89,6 +89,14 @@ class Video extends UidModel
     }
 
     /**
+     * @return bool
+     */
+    public function readyToPlay()
+    {
+        return !is_null($this->playable);
+    }
+
+    /**
      * @return BelongsTo
      */
     public function category()
@@ -110,5 +118,13 @@ class Video extends UidModel
     public function tags()
     {
         return $this->hasMany(TagInVideo::class, 'video_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'video_id');
     }
 }

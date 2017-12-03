@@ -20,3 +20,4 @@ $router->get('/users/{id}', 'UsersController@profile');
 
 $router->post('/videos', ['middleware' => 'auth', 'uses' => 'VideosController@create']);
 $router->post('/videos/{id}', ['middleware' => 'auth', 'uses' => 'VideosController@upload']);
+$router->get('/videos/{id}', 'VideosController@watch');

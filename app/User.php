@@ -51,6 +51,7 @@ class User extends Model
         'deleted_at',
         'password',
         'pivot',
+        'remember_token',
     ];
 
     /**

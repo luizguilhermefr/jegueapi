@@ -10,6 +10,7 @@ use App\Exceptions\StringLengthException;
 use App\Exceptions\UnauthorizedUserException;
 use App\Exceptions\VideoAlreadyUploadedException;
 use App\Exceptions\VideoNotFoundException;
+use App\Exceptions\VideoNotReadyException;
 use App\Helpers\Validator;
 use App\Jobs\ParseVideoJob;
 use App\Video;
@@ -98,5 +99,35 @@ class VideosController extends Controller
         dispatch(new ParseVideoJob($video, $path));
 
         return response()->json(['success' => true], 200);
+    }
+
+    /**
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     * @throws VideoNotFoundException
+     * @throws VideoNotReadyException
+     */
+    public function watch(Request $request, $id)
+    {
+        $video = Video::find($id);
+        if (! $video) {
+            throw new VideoNotFoundException();
+        }
+        if (! $video->readyToPlay()) {
+            throw new VideoNotReadyException();
+        }
+
+        $video->load([
+            'category' => function ($t) {
+                $t->select('id', 'name');
+            },
+        ]);
+
+        $commentCount = $video->comments()
+            ->count();
+
+        return response()->json(['video' => $video, 'comments' => $commentCount], 200);
     }
 }
