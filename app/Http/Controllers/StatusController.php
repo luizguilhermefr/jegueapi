@@ -14,8 +14,9 @@ class StatusController extends Controller
     public function checkStatus()
     {
         return response()->json([
-           'status' => true,
-           'message' => 'JegueStreaming up and running.'
+            'status' => true,
+            'message' => 'JegueStreaming up and running.',
+            'version' => 'ALPHA 0.1.0',
         ], 200);
     }
 }

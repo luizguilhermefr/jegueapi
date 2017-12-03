@@ -9,6 +9,7 @@ use App\Exceptions\PasswordConfirmationException;
 use App\Exceptions\RequiredParameterException;
 use App\Exceptions\StringLengthException;
 use App\Exceptions\UsernameAlreadyTakenException;
+use App\Exceptions\UserNotFoundException;
 use App\Helpers\Validator;
 use App\User;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ use Illuminate\Http\Request;
 class UsersController extends Controller
 {
     /**
-     * Registra um usuário na plataforma.
+     * Register an user within the plataform.
      *
      * @param Request $request
      * @return JsonResponse
@@ -50,12 +51,12 @@ class UsersController extends Controller
         return response()->json([
             'success' => true,
             'url' => $user->getChannelUrl(),
-            'token' => $user->getRememberToken()
+            'token' => $user->getRememberToken(),
         ], 201);
     }
 
     /**
-     * Entra na plataforma.
+     * Enter the plataform.
      *
      * @param Request $request
      * @return JsonResponse
@@ -69,8 +70,51 @@ class UsersController extends Controller
         }
 
         return response()->json([
-           'success' => true,
-           'token' => $user->getRememberToken()
+            'success' => true,
+            'token' => $user->getRememberToken(),
         ]);
+    }
+
+    /**
+     * Get some user profile.
+     *
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws UserNotFoundException
+     */
+    public function profile(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (! $user) {
+            throw new UserNotFoundException();
+        }
+
+        $follows = $user->follows()
+            ->select('username', 'description')
+            ->take(10)
+            ->get();
+
+        $followers = $user->followers()
+            ->select('username', 'description')
+            ->take(10)
+            ->get();
+
+        $videos = $user->videos()
+            ->select('id', 'name', 'created_at', 'category_id')
+            ->with(['category' => function ($t) {
+               $t->select('id', 'name');
+            }])
+            ->whereNotNull('playable')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return response()->json([
+            'user' => $user,
+            'follows' => $follows,
+            'followers' => $followers,
+            'videos' => $videos,
+        ], 200);
     }
 }

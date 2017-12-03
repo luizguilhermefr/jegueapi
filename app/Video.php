@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Video extends UidModel
@@ -26,7 +27,9 @@ class Video extends UidModel
      *
      * @var array
      */
-    protected $hidden = [];
+    protected $hidden = [
+        'deleted_at'
+    ];
 
     /**
      * @param string $tag
@@ -63,6 +66,42 @@ class Video extends UidModel
         $this->thumbnail = $url;
 
         return $this;
+    }
+
+    /**
+     * @param string $val
+     * @return string
+     */
+    public function getThumbnailAttribute($val)
+    {
+        $baseUrl = config('app.url');
+        return is_null($val) ? null : "{$baseUrl}/$val";
+    }
+
+    /**
+     * @param string $val
+     * @return string
+     */
+    public function getPlayableAttribute($val)
+    {
+        $baseUrl = config('app.url');
+        return is_null($val) ? null : "{$baseUrl}/$val";
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner');
     }
 
     /**

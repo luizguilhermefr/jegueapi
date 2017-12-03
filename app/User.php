@@ -3,9 +3,32 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Model
 {
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    public $primaryKey = 'username';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,7 +48,9 @@ class User extends Model
      * @var array
      */
     protected $hidden = [
+        'deleted_at',
         'password',
+        'pivot',
     ];
 
     /**
@@ -108,5 +133,29 @@ class User extends Model
     {
         return self::where('remember_token', $token)
             ->first();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'owner');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function follows()
+    {
+        return $this->belongsToMany(User::class, 'channels_follows_channels', 'follower', 'followed');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'channels_follows_channels', 'followed', 'follower');
     }
 }

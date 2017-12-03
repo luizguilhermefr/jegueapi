@@ -19,7 +19,8 @@ use Illuminate\Http\Request;
 class VideosController extends Controller
 {
     /**
-     * Efetua o cadastro de um vídeo. O vídeo é enviado posteriormente.
+     * Register a video within the plataform.
+     * The upload comes after.
      *
      * @param Request $request
      * @return JsonResponse
@@ -60,6 +61,8 @@ class VideosController extends Controller
     }
 
     /**
+     * Upload a video.
+     *
      * @param Request $request
      * @param string $id
      * @return JsonResponse
