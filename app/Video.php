@@ -75,7 +75,7 @@ class Video extends UidModel
     public function getThumbnailAttribute($val)
     {
         $baseUrl = config('app.url');
-        return is_null($val) ? null : "{$baseUrl}/$val";
+        return is_null($val) ? null : "{$baseUrl}/storage/$val";
     }
 
     /**
@@ -85,7 +85,7 @@ class Video extends UidModel
     public function getPlayableAttribute($val)
     {
         $baseUrl = config('app.url');
-        return is_null($val) ? null : "{$baseUrl}/$val";
+        return is_null($val) ? null : "{$baseUrl}/storage/$val";
     }
 
     /**
