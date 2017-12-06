@@ -23,7 +23,6 @@ class RegisterAndLoginTest extends TestCase
         ];
         $responseData = [
             'success' => true,
-            'url' => '/users/jailsonmendes',
         ];
         $response = $this->json('POST', '/register', $userData);
         $response->assertResponseStatus(201);
@@ -161,7 +160,7 @@ class RegisterAndLoginTest extends TestCase
             'password' => 'myPassword',
         ];
         $responseData = [
-            'success' => true,
+            'success' => true
         ];
         $response = $this->json('POST', '/login', $userData);
         $response->assertResponseStatus(200);

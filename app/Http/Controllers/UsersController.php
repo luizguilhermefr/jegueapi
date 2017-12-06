@@ -50,8 +50,7 @@ class UsersController extends Controller
 
         return response()->json([
             'success' => true,
-            'url' => $user->getChannelUrl(),
-            'token' => $user->getRememberToken(),
+            'user' => $user->makeVisible('remember_token'),
         ], 201);
     }
 
@@ -71,7 +70,7 @@ class UsersController extends Controller
 
         return response()->json([
             'success' => true,
-            'token' => $user->getRememberToken(),
+            'user' => $user->makeVisible('remember_token'),
         ]);
     }
 
