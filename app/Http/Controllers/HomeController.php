@@ -28,9 +28,12 @@ class HomeController extends Controller
             ->get();
 
         foreach ($suggestedChannels as $channel) {
-            $channel->load(['videos' => function ($v) {
-               $v->take(3);
-            }]);
+            $channel->load([
+                'videos' => function ($v) {
+                    $v->whereNotNull('playable');
+                    $v->take(3);
+                },
+            ]);
         }
 
         return response()->json([
