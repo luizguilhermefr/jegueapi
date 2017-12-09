@@ -100,7 +100,7 @@ class UsersController extends Controller
             ->get();
 
         $videos = $user->videos()
-            ->select('id', 'name', 'created_at', 'category_id')
+            ->select('id', 'name', 'created_at', 'category_id', 'thumbnail')
             ->with(['category' => function ($t) {
                $t->select('id', 'name');
             }])
