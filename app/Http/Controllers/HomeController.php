@@ -23,16 +23,15 @@ class HomeController extends Controller
             ->get();
 
         $suggestedChannels = User::has('videos', '>=', 3)
-            ->with([
-                'videos' => function ($q) {
-                    $q->whereNotNull('playable');
-                    $q->inRandomOrder();
-                    $q->take(3);
-                },
-            ])
             ->inRandomOrder()
-            ->take(2)
+            ->take(3)
             ->get();
+
+        foreach ($suggestedChannels as $channel) {
+            $channel->load(['videos' => function ($v) {
+               $v->take(3);
+            }]);
+        }
 
         return response()->json([
             'suggested_videos' => $suggestedVideos,
