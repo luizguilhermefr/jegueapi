@@ -2,7 +2,7 @@
 
 return [
 
-    'url' => env('APP_URL', 'http://api.jeguestreaming.tk'),
+    'url' => env('APP_URL', 'https://api.jeguestreaming.tk'),
 
     /*
     |--------------------------------------------------------------------------

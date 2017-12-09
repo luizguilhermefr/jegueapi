@@ -18,14 +18,18 @@ class HomeController extends Controller
     public function home(Request $request)
     {
         $suggestedVideos = Video::inRandomOrder()
+            ->whereNotNull('playable')
             ->take(3)
             ->get();
 
         $suggestedChannels = User::has('videos', '>=', 3)
-            ->with(['videos' => function ($q) {
-                $q->inRandomOrder();
-                $q->take(3);
-            }])
+            ->with([
+                'videos' => function ($q) {
+                    $q->whereNotNull('playable');
+                    $q->inRandomOrder();
+                    $q->take(3);
+                },
+            ])
             ->inRandomOrder()
             ->take(2)
             ->get();
